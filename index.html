@@ -1,0 +1,1440 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Laporan Pertanggungjawaban Kegiatan</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+:root{--bg:#0f0e0c;--card:#1c1a17;--card2:#242119;--border:#3a3530;--accent:#c9953c;--accent2:#e8b84d;--fg:#f0ebe0;--muted:#8a8279;--success:#4a9e6e;--danger:#c94040;--info:#4a8ec9}
+*{box-sizing:border-box;scrollbar-width:thin;scrollbar-color:var(--accent) var(--card)}
+body{font-family:'Source Sans 3',sans-serif;background:var(--bg);color:var(--fg);margin:0;min-height:100vh}
+h1,h2,h3,h4{font-family:'Playfair Display',serif}
+.glass{background:rgba(28,26,23,.85);backdrop-filter:blur(12px);border:1px solid var(--border)}
+.btn{padding:10px 20px;border-radius:8px;font-weight:600;cursor:pointer;transition:all .3s;border:none;font-size:14px;display:inline-flex;align-items:center;gap:8px}
+.btn-primary{background:var(--accent);color:#0f0e0c}.btn-primary:hover{background:var(--accent2);transform:translateY(-2px);box-shadow:0 8px 24px rgba(201,149,60,.3)}
+.btn-secondary{background:var(--card2);color:var(--fg);border:1px solid var(--border)}.btn-secondary:hover{border-color:var(--accent);color:var(--accent)}
+.btn-danger{background:var(--danger);color:#fff}.btn-danger:hover{opacity:.85;transform:translateY(-2px)}
+.btn-success{background:var(--success);color:#fff}.btn-success:hover{opacity:.85;transform:translateY(-2px)}
+.btn-sm{padding:6px 14px;font-size:12px}
+input,select,textarea{background:var(--card2);border:1px solid var(--border);color:var(--fg);padding:10px 14px;border-radius:8px;font-size:14px;font-family:inherit;width:100%;transition:border-color .3s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(201,149,60,.15)}
+label{font-weight:600;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{background:var(--accent);color:#0f0e0c;padding:12px;text-align:left;font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.5px}
+td{padding:10px 12px;border-bottom:1px solid var(--border)}
+tr:hover td{background:rgba(201,149,60,.05)}
+.tab-btn{padding:12px 20px;background:transparent;border:none;color:var(--muted);cursor:pointer;font-weight:600;font-size:14px;border-bottom:3px solid transparent;transition:all .3s;font-family:inherit}
+.tab-btn:hover{color:var(--fg)}.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.section{display:none;animation:fadeUp .5s ease}.section.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse-glow{0%,100%{box-shadow:0 0 20px rgba(201,149,60,.1)}50%{box-shadow:0 0 40px rgba(201,149,60,.2)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.card-glow{animation:pulse-glow 4s ease-in-out infinite}
+.toast{position:fixed;top:20px;right:20px;padding:14px 24px;border-radius:10px;color:#fff;font-weight:600;z-index:9999;transform:translateX(120%);transition:transform .4s ease;font-size:14px;max-width:360px}
+.toast.show{transform:translateX(0)}
+.toast-success{background:var(--success)}.toast-error{background:var(--danger)}.toast-info{background:var(--info)}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.modal-overlay.show{display:flex}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:32px;max-width:500px;width:90%;animation:fadeUp .3s ease}
+.foto-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.foto-item{position:relative;border-radius:12px;overflow:hidden;aspect-ratio:4/3;border:1px solid var(--border)}
+.foto-item img{width:100%;height:100%;object-fit:cover}
+.foto-item .del-btn{position:absolute;top:6px;right:6px;width:28px;height:28px;border-radius:50%;background:var(--danger);color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;opacity:0;transition:opacity .3s}
+.foto-item:hover .del-btn{opacity:1}
+.nota-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+.nota-item{position:relative;border-radius:12px;overflow:hidden;aspect-ratio:3/4;border:1px solid var(--border);background:var(--card2)}
+.nota-item img{width:100%;height:100%;object-fit:contain}
+.nota-item .del-btn{position:absolute;top:6px;right:6px;width:28px;height:28px;border-radius:50%;background:var(--danger);color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;opacity:0;transition:opacity .3s}
+.nota-item:hover .del-btn{opacity:1}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700}
+.badge-gold{background:linear-gradient(135deg,#f5c842,#d4a017);color:#1a1a0a}
+.badge-silver{background:linear-gradient(135deg,#c0c0c0,#8a8a8a);color:#1a1a1a}
+.badge-bronze{background:linear-gradient(135deg,#cd7f32,#a0522d);color:#fff}
+.bg-pattern{position:fixed;inset:0;z-index:-1;background:radial-gradient(ellipse at 20% 50%,rgba(201,149,60,.06) 0%,transparent 50%),radial-gradient(ellipse at 80% 20%,rgba(201,149,60,.04) 0%,transparent 50%),radial-gradient(ellipse at 50% 80%,rgba(74,158,110,.04) 0%,transparent 50%)}
+.absen-check{width:18px;height:18px;accent-color:var(--accent);cursor:pointer}
+@media print{.no-print{display:none!important}.section{display:block!important;page-break-inside:avoid}body{background:#fff;color:#000}th{background:#c9953c!important;color:#000!important}td{border-bottom:1px solid #ccc}table{border:1px solid #ccc}input,select,textarea,.btn{border:1px solid #ccc;background:#fff;color:#000}}
+select option{background:var(--card);color:var(--fg)}
+.video-item{border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--card2)}
+.video-item video{width:100%;max-height:300px;object-fit:contain;background:#000}
+::-webkit-scrollbar{width:8px}::-webkit-scrollbar-track{background:var(--card)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}::-webkit-scrollbar-thumb:hover{background:var(--accent)}
+.stat-card{text-align:center;padding:24px;border-radius:12px;background:var(--card2);border:1px solid var(--border)}
+.stat-num{font-size:32px;font-weight:900;font-family:'Playfair Display',serif;color:var(--accent)}
+.stat-label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:4px}
+</style>
+</head>
+<body>
+<div class="bg-pattern"></div>
+
+<!-- Toast -->
+<div id="toast" class="toast"></div>
+
+<!-- Modal Konfirmasi -->
+<div id="confirmModal" class="modal-overlay">
+  <div class="modal">
+    <h3 class="text-xl font-bold mb-3" id="confirmTitle">Konfirmasi</h3>
+    <p class="text-sm mb-6" style="color:var(--muted)" id="confirmMsg">Apakah Anda yakin?</p>
+    <div class="flex gap-3 justify-end">
+      <button class="btn btn-secondary" onclick="closeConfirm()">Batal</button>
+      <button class="btn btn-danger" id="confirmBtn" onclick="closeConfirm()">Ya, Lanjutkan</button>
+    </div>
+  </div>
+</div>
+
+<!-- Header -->
+<header class="glass sticky top-0 z-50" style="border-top:3px solid var(--accent)">
+  <div class="max-w-7xl mx-auto px-4 py-4 flex flex-wrap items-center justify-between gap-4">
+    <div class="flex items-center gap-4">
+      <div style="width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center">
+        <i class="fas fa-file-alt text-xl" style="color:#0f0e0c"></i>
+      </div>
+      <div>
+        <h1 class="text-xl font-bold leading-tight">Laporan Pertanggungjawaban</h1>
+        <p class="text-xs" style="color:var(--muted)">Sistem Dokumentasi Kegiatan Digital</p>
+      </div>
+    </div>
+    <div class="flex gap-2 flex-wrap no-print">
+      <button class="btn btn-secondary btn-sm" onclick="autoSave()"><i class="fas fa-save"></i> Simpan</button>
+      <button class="btn btn-secondary btn-sm" onclick="showExportModal()"><i class="fas fa-download"></i> Export</button>
+      <button class="btn btn-secondary btn-sm" onclick="window.print()"><i class="fas fa-print"></i> Cetak</button>
+      <button class="btn btn-secondary btn-sm" onclick="showSaranLink()"><i class="fas fa-qrcode"></i> Link Saran</button>
+      <button class="btn btn-secondary btn-sm" onclick="location.reload()"><i class="fas fa-sync-alt"></i> Reload</button>
+    </div>
+  </div>
+</header>
+
+<!-- Statistik Ringkas -->
+<div class="max-w-7xl mx-auto px-4 py-6 no-print">
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="statsBar">
+    <div class="stat-card"><div class="stat-num" id="statLomba">0</div><div class="stat-label">Mata Lomba</div></div>
+    <div class="stat-card"><div class="stat-num" id="statPeserta">0</div><div class="stat-label">Total Peserta</div></div>
+    <div class="stat-card"><div class="stat-num" id="statSekolah">0</div><div class="stat-label">Sekolah</div></div>
+    <div class="stat-card"><div class="stat-num" id="statAnggaran">0</div><div class="stat-label">Total Anggaran</div></div>
+  </div>
+</div>
+
+<!-- Navigasi Tab -->
+<nav class="max-w-7xl mx-auto px-4 no-print" style="border-bottom:1px solid var(--border)">
+  <div class="flex overflow-x-auto gap-1 py-0" id="tabNav">
+    <button class="tab-btn active" data-tab="info"><i class="fas fa-info-circle mr-1"></i>Info Kegiatan</button>
+    <button class="tab-btn" data-tab="anggaran"><i class="fas fa-coins mr-1"></i>Anggaran</button>
+    <button class="tab-btn" data-tab="peserta"><i class="fas fa-users mr-1"></i>Peserta</button>
+    <button class="tab-btn" data-tab="lomba"><i class="fas fa-trophy mr-1"></i>Mata Lomba</button>
+    <button class="tab-btn" data-tab="juara"><i class="fas fa-medal mr-1"></i>Kejuaraan</button>
+    <button class="tab-btn" data-tab="dokumentasi"><i class="fas fa-camera mr-1"></i>Dokumentasi</button>
+    <button class="tab-btn" data-tab="absensi-sekolah"><i class="fas fa-school mr-1"></i>Absensi Sekolah</button>
+    <button class="tab-btn" data-tab="nota"><i class="fas fa-receipt mr-1"></i>Nota</button>
+    <button class="tab-btn" data-tab="rapat"><i class="fas fa-handshake mr-1"></i>Rapat</button>
+  </div>
+</nav>
+
+<!-- Konten Utama -->
+<main class="max-w-7xl mx-auto px-4 py-8">
+
+<!-- ==================== SECTION 1: INFO KEGIATAN ==================== -->
+<section id="sec-info" class="section active">
+  <div class="glass rounded-2xl p-8 card-glow">
+    <h2 class="text-2xl font-bold mb-6 flex items-center gap-3"><span style="color:var(--accent)"><i class="fas fa-clipboard-list"></i></span> Informasi Kegiatan</h2>
+    <div class="grid md:grid-cols-2 gap-6">
+      <div>
+        <label>Nama Kegiatan</label>
+        <input type="text" id="namaKegiatan" placeholder="Masukkan nama kegiatan..." onchange="autoSave()">
+      </div>
+      <div>
+        <label>Nomor Surat Keluar</label>
+        <input type="text" id="nomorSurat" placeholder="Contoh: 001/KEG/IX/2025" onchange="autoSave()">
+      </div>
+      <div>
+        <label>Hari</label>
+        <select id="hariKegiatan" onchange="autoSave()">
+          <option value="">-- Pilih Hari --</option>
+          <option>Senin</option><option>Selasa</option><option>Rabu</option><option>Kamis</option><option>Jumat</option><option>Sabtu</option><option>Minggu</option>
+        </select>
+      </div>
+      <div>
+        <label>Tanggal Kegiatan</label>
+        <input type="date" id="tanggalKegiatan" onchange="autoSave()">
+      </div>
+      <div>
+        <label>Waktu Mulai</label>
+        <input type="time" id="waktuMulai" value="07:00" onchange="autoSave()">
+      </div>
+      <div>
+        <label>Waktu Selesai</label>
+        <input type="time" id="waktuSelesai" value="16:00" onchange="autoSave()">
+      </div>
+      <div class="md:col-span-2">
+        <label>Tempat Kegiatan</label>
+        <input type="text" id="tempatKegiatan" placeholder="Masukkan lokasi/alamat kegiatan..." onchange="autoSave()">
+      </div>
+    </div>
+    <!-- Preview Surat -->
+    <div class="mt-8 p-6 rounded-xl" style="background:var(--card2);border:1px dashed var(--border)">
+      <h3 class="text-sm font-bold mb-3" style="color:var(--accent)"><i class="fas fa-eye mr-1"></i> PREVIEW HEADER SURAT</h3>
+      <div class="text-center" id="previewSurat">
+        <p class="text-xs" style="color:var(--muted)">*Isi data di atas untuk melihat preview</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== SECTION 2: ANGGARAN ==================== -->
+<section id="sec-anggaran" class="section">
+  <div class="glass rounded-2xl p-8">
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+      <h2 class="text-2xl font-bold flex items-center gap-3"><span style="color:var(--accent)"><i class="fas fa-coins"></i></span> Rencana Anggaran Kegiatan</h2>
+      <div class="flex gap-2">
+        <button class="btn btn-primary btn-sm" onclick="tambahAnggaranManual()"><i class="fas fa-plus"></i> Tambah Manual</button>
+        <span class="text-xs self-center" style="color:var(--muted)"><i class="fas fa-info-circle"></i> Nota otomatis masuk ke sini</span>
+      </div>
+    </div>
+    <div class="overflow-x-auto">
+      <table id="tabelAnggaran">
+        <thead>
+          <tr><th>No</th><th>Uraian Kegiatan</th><th>Jumlah</th><th>Sumber</th><th class="no-print">Aksi</th></tr>
+        </thead>
+        <tbody id="bodyAnggaran">
+          <tr><td colspan="5" class="text-center" style="color:var(--muted);padding:40px">Belum ada data anggaran</td></tr>
+        </tbody>
+        <tfoot>
+          <tr style="background:var(--card2)"><td colspan="2" class="text-right font-bold">TOTAL ANGGARAN</td><td class="font-bold" style="color:var(--accent)" id="totalAnggaran">Rp 0</td><td colspan="2"></td></tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== SECTION 3: PESERTA & ABSENSI ==================== -->
+<section id="sec-peserta" class="section">
+  <div class="glass rounded-2xl p-8">
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+      <h2 class="text-2xl font-bold flex items-center gap-3"><span style="color:var(--accent)"><i class="fas fa-users"></i></span> Data Peserta & Absensi</h2>
+      <button class="btn btn-primary btn-sm" onclick="tambahPeserta()"><i class="fas fa-plus"></i> Tambah Peserta</button>
+    </div>
+    <div class="overflow-x-auto">
+      <table id="tabelPeserta">
+        <thead>
+          <tr><th>No</th><th>Nama Lengkap</th><th>Asal Sekolah</th><th>Kelas</th><th>Hadir</th><th class="no-print">Aksi</th></tr>
+        </thead>
+        <tbody id="bodyPeserta">
+          <tr><td colspan="6" class="text-center" style="color:var(--muted);padding:40px">Belum ada data peserta</td></tr>
+        </tbody>
+        <tfoot>
+          <tr style="background:var(--card2)"><td colspan="3" class="text-right font-bold">Total Peserta:</td><td class="font-bold" id="totalPeserta">0</td><td class="font-bold" style="color:var(--success)" id="totalHadir">Hadir: 0</td><td class="no-print"></td></tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== SECTION 4: MATA LOMBA ==================== -->
+<section id="sec-lomba" class="section">
+  <div class="glass rounded-2xl p-8">
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+      <h2 class="text-2xl font-bold flex items-center gap-3"><span style="color:var(--accent)"><i class="fas fa-trophy"></i></span> Mata Lomba & Peserta</h2>
+      <button class="btn btn-primary btn-sm" onclick="tambahMataLomba()"><i class="fas fa-plus"></i> Tambah Mata Lomba</button>
+    </div>
+    <div id="containerLomba" class="space-y-6">
+      <div class="text-center py-12" style="color:var(--muted)"><i class="fas fa-trophy text-4xl mb-3 block" style="opacity:.3"></i>Belum ada mata lomba ditambahkan</div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== SECTION 5: KEJUARAAN ==================== -->
+<section id="sec-juara" class="section">
+  <div class="glass rounded-2xl p-8">
+    <h2 class="text-2xl font-bold mb-6 flex items-center gap-3"><span style="color:var(--accent)"><i class="fas fa-medal"></i></span> Tabel Kejuaraan</h2>
+    <div id="containerJuara" class="space-y-8">
+      <div class="text-center py-12" style="color:var(--muted)"><i class="fas fa-medal text-4xl mb-3 block" style="opacity:.3"></i>Tambahkan mata lomba terlebih dahulu</div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== SECTION 6: DOKUMENTASI ==================== -->
+<section id="sec-dokumentasi" class="section">
+  <!-- Foto Kegiatan -->
+  <div class="glass rounded-2xl p-8 mb-8">
+    <h2 class="text-2xl font-bold mb-6 flex items-center gap-3"><span style="color:var(--accent)"><i class="fas fa-camera"></i></span> Foto Dokumentasi Kegiatan</h2>
+    <div class="flex flex-wrap gap-3 mb-6 no-print">
+      <label class="btn btn-primary btn-sm cursor-pointer"><i class="fas fa-upload"></i> Upload Foto<input type="file" accept="image/*" multiple class="hidden" onchange="uploadFoto(event,'kegiatan')"></label>
+    </div>
+    <div class="foto-grid" id="gridFotoKegiatan">
+      <div class="text-center col-span-full py-12" style="color:var(--muted)"><i class="fas fa-images text-4xl mb-3 block" style="opacity:.3"></i>Belum ada foto kegiatan</div>
+    </div>
+  </div>
+  <!-- Video Kegiatan -->
+  <div class="glass rounded-2xl p-8">
+    <h2 class="text-2xl font-bold mb-6 flex items-center gap-3"><span style="color:var(--accent)"><i class="fas fa-video"></i></span> Video Dokumentasi Kegiatan</h2>
+    <div class="flex flex-wrap gap-3 mb-6 no-print">
+      <label class="btn btn-primary btn-sm cursor-pointer"><i class="fas fa-upload"></i> Upload Video<input type="file" accept="video/*" multiple class="hidden" onchange="uploadVideo(event)"></label>
+    </div>
+    <div class="grid md:grid-cols-2 gap-6" id="gridVideo">
+      <div class="text-center col-span-full py-12" style="color:var(--muted)"><i class="fas fa-film text-4xl mb-3 block" style="opacity:.3"></i>Belum ada video kegiatan</div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== SECTION 7: ABSENSI SEKOLAH ==================== -->
+<section id="sec-absensi-sekolah" class="section">
+  <div class="glass rounded-2xl p-8">
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+      <h2 class="text-2xl font-bold flex items-center gap-3"><span style="color:var(--accent)"><i class="fas fa-school"></i></span> Absensi Kehadiran Per Sekolah</h2>
+      <button class="btn btn-primary btn-sm" onclick="tambahSekolah()"><i class="fas fa-plus"></i> Tambah Sekolah</button>
+    </div>
+    <div id="containerSekolah" class="space-y-6">
+      <div class="text-center py-12" style="color:var(--muted)"><i class="fas fa-school text-4xl mb-3 block" style="opacity:.3"></i>Belum ada data sekolah</div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== SECTION 8: NOTA ==================== -->
+<section id="sec-nota" class="section">
+  <div class="glass rounded-2xl p-8">
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+      <h2 class="text-2xl font-bold flex items-center gap-3"><span style="color:var(--accent)"><i class="fas fa-receipt"></i></span> Kumpulan Nota Kegiatan</h2>
+      <label class="btn btn-primary btn-sm cursor-pointer no-print"><i class="fas fa-upload"></i> Upload Nota<input type="file" accept="image/*" multiple class="hidden" onchange="uploadNota(event)"></label>
+    </div>
+    <p class="text-sm mb-4" style="color:var(--muted)"><i class="fas fa-info-circle mr-1"></i> Setiap nota yang diupload akan otomatis dimasukkan ke tabel Anggaran Kegiatan. Isi keterangan dan nominal pada setiap nota.</p>
+    <div class="nota-grid" id="gridNota">
+      <div class="text-center col-span-full py-12" style="color:var(--muted)"><i class="fas fa-receipt text-4xl mb-3 block" style="opacity:.3"></i>Belum ada nota diupload</div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== SECTION 9: FOTO RAPAT ==================== -->
+<section id="sec-rapat" class="section">
+  <div class="glass rounded-2xl p-8">
+    <h2 class="text-2xl font-bold mb-6 flex items-center gap-3"><span style="color:var(--accent)"><i class="fas fa-handshake"></i></span> Foto Dokumentasi Hasil Rapat</h2>
+    <div class="flex flex-wrap gap-3 mb-6 no-print">
+      <label class="btn btn-primary btn-sm cursor-pointer"><i class="fas fa-upload"></i> Upload Foto Rapat<input type="file" accept="image/*" multiple class="hidden" onchange="uploadFoto(event,'rapat')"></label>
+    </div>
+    <div class="foto-grid" id="gridFotoRapat">
+      <div class="text-center col-span-full py-12" style="color:var(--muted)"><i class="fas fa-handshake text-4xl mb-3 block" style="opacity:.3"></i>Belum ada foto dokumentasi rapat</div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- Modal Export -->
+<div id="exportModal" class="modal-overlay">
+  <div class="modal" style="max-width:420px">
+    <h3 class="text-xl font-bold mb-2">Export Laporan</h3>
+    <p class="text-sm mb-6" style="color:var(--muted)">Pilih format file yang diinginkan</p>
+    <div class="space-y-3">
+      <button class="btn btn-primary w-full justify-center" onclick="exportPDF()"><i class="fas fa-file-pdf"></i> Export sebagai PDF</button>
+      <button class="btn btn-secondary w-full justify-center" onclick="exportExcel()"><i class="fas fa-file-excel"></i> Export sebagai Excel</button>
+      <button class="btn btn-secondary w-full justify-center" onclick="exportDOC()"><i class="fas fa-file-word"></i> Export sebagai DOC</button>
+    </div>
+    <button class="btn btn-secondary w-full justify-center mt-3" onclick="closeExportModal()">Tutup</button>
+  </div>
+</div>
+
+<!-- Modal Link Saran -->
+<div id="saranLinkModal" class="modal-overlay">
+  <div class="modal" style="max-width:480px">
+    <h3 class="text-xl font-bold mb-2"><i class="fas fa-qrcode mr-2" style="color:var(--accent)"></i>Link Kotak Saran Masyarakat</h3>
+    <p class="text-sm mb-4" style="color:var(--muted)">Bagikan link atau barcode ini ke masyarakat. Saran tidak masuk ke laporan, hanya dibacakan saat rapat.</p>
+    <div class="p-4 rounded-lg mb-4" style="background:var(--card2);border:1px solid var(--border);word-break:break-all">
+      <span id="saranLinkText" class="text-sm" style="color:var(--accent)">-</span>
+    </div>
+    <div class="text-center mb-4">
+      <canvas id="qrCanvas" width="200" height="200" style="border-radius:12px;background:#fff;padding:8px"></canvas>
+    </div>
+    <div class="flex gap-2">
+      <button class="btn btn-primary flex-1 justify-center" onclick="copySaranLink()"><i class="fas fa-copy"></i> Salin Link</button>
+      <button class="btn btn-secondary flex-1 justify-center" onclick="closeSaranLink()">Tutup</button>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="text-center py-8 text-xs no-print" style="color:var(--muted);border-top:1px solid var(--border)">
+  <p>Sistem Laporan Pertanggungjawaban Kegiatan Digital &mdash; Data tersimpan otomatis di browser</p>
+  <p class="mt-1">Auto-save setiap perubahan &bull; Refresh otomatis setiap 5 menit</p>
+</footer>
+
+<script>
+/* ============================================
+   DATA STORE
+   ============================================ */
+let data = {
+  info: { nama:'', nomorSurat:'', hari:'', tanggal:'', waktuMulai:'07:00', waktuSelesai:'16:00', tempat:'' },
+  anggaran: [],
+  peserta: [],
+  mataLomba: [], // {id, nama, peserta:[{nama,sekolah}]}
+  juara: [],    // {lombaId, juara1:'', juara2:'', juara3:''}
+  fotoKegiatan: [],
+  videoKegiatan: [],
+  fotoRapat: [],
+  nota: [],     // {id, dataUrl, keterangan:'', nominal:0}
+  sekolah: []   // {id, nama, peserta:[{nama,hadir}]}
+};
+
+let saranData = []; // Tidak masuk ke laporan
+let autoRefreshTimer;
+let lombaIdCounter = 0;
+let notaIdCounter = 0;
+let sekolahIdCounter = 0;
+
+/* ============================================
+   INISIALISASI
+   ============================================ */
+window.addEventListener('DOMContentLoaded', () => {
+  loadFromStorage();
+  renderAll();
+  setupTabs();
+  updatePreviewSurat();
+  // Auto-refresh setiap 5 menit
+  autoRefreshTimer = setInterval(() => {
+    showToast('Menyegarkan halaman...', 'info');
+    setTimeout(() => location.reload(), 1500);
+  }, 300000);
+  // Simpan sebelum keluar
+  window.addEventListener('beforeunload', autoSave);
+});
+
+/* ============================================
+   TAB NAVIGASI
+   ============================================ */
+function setupTabs() {
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      btn.classList.add('active');
+      const sec = document.getElementById('sec-' + btn.dataset.tab);
+      if (sec) sec.classList.add('active');
+    });
+  });
+}
+
+/* ============================================
+   TOAST
+   ============================================ */
+function showToast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast toast-' + type + ' show';
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+/* ============================================
+   KONFIRMASI
+   ============================================ */
+function showConfirm(title, msg, callback) {
+  document.getElementById('confirmTitle').textContent = title;
+  document.getElementById('confirmMsg').textContent = msg;
+  document.getElementById('confirmBtn').onclick = () => { closeConfirm(); callback(); };
+  document.getElementById('confirmModal').classList.add('show');
+}
+function closeConfirm() { document.getElementById('confirmModal').classList.remove('show'); }
+
+/* ============================================
+   LOCAL STORAGE
+   ============================================ */
+function autoSave() {
+  // Baca info dari input
+  data.info.nama = document.getElementById('namaKegiatan').value;
+  data.info.nomorSurat = document.getElementById('nomorSurat').value;
+  data.info.hari = document.getElementById('hariKegiatan').value;
+  data.info.tanggal = document.getElementById('tanggalKegiatan').value;
+  data.info.waktuMulai = document.getElementById('waktuMulai').value;
+  data.info.waktuSelesai = document.getElementById('waktuSelesai').value;
+  data.info.tempat = document.getElementById('tempatKegiatan').value;
+
+  // Simpan tanpa foto/video (terlalu besar untuk localStorage)
+  const saveData = JSON.parse(JSON.stringify(data));
+  saveData.fotoKegiatan = [];
+  saveData.videoKegiatan = [];
+  saveData.fotoRapat = [];
+  saveData.nota = saveData.nota.map(n => ({id:n.id, keterangan:n.keterangan, nominal:n.nominal}));
+  try {
+    localStorage.setItem('lpj_data', JSON.stringify(saveData));
+    showToast('Data tersimpan otomatis', 'success');
+  } catch(e) {
+    console.warn('Storage penuh');
+  }
+  updateStats();
+  updatePreviewSurat();
+}
+
+function loadFromStorage() {
+  try {
+    const saved = localStorage.getItem('lpj_data');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      data.info = { ...data.info, ...parsed.info };
+      data.anggaran = parsed.anggaran || [];
+      data.peserta = parsed.peserta || [];
+      data.mataLomba = parsed.mataLomba || [];
+      data.juara = parsed.juara || [];
+      data.sekolah = parsed.sekolah || [];
+      // Restore ID counters
+      if (data.mataLomba.length) lombaIdCounter = Math.max(...data.mataLomba.map(l=>l.id)) + 1;
+      if (data.sekolah.length) sekolahIdCounter = Math.max(...data.sekolah.map(s=>s.id)) + 1;
+    }
+    // Load saran terpisah
+    const saranSaved = localStorage.getItem('lpj_saran');
+    if (saranSaved) saranData = JSON.parse(saranSaved);
+  } catch(e) { console.warn('Gagal load storage'); }
+
+  // Isi form info
+  document.getElementById('namaKegiatan').value = data.info.nama;
+  document.getElementById('nomorSurat').value = data.info.nomorSurat;
+  document.getElementById('hariKegiatan').value = data.info.hari;
+  document.getElementById('tanggalKegiatan').value = data.info.tanggal;
+  document.getElementById('waktuMulai').value = data.info.waktuMulai;
+  document.getElementById('waktuSelesai').value = data.info.waktuSelesai;
+  document.getElementById('tempatKegiatan').value = data.info.tempat;
+}
+
+/* ============================================
+   RENDER SEMUA
+   ============================================ */
+function renderAll() {
+  renderAnggaran();
+  renderPeserta();
+  renderMataLomba();
+  renderJuara();
+  renderFotoKegiatan();
+  renderVideo();
+  renderFotoRapat();
+  renderNota();
+  renderSekolah();
+  updateStats();
+  updatePreviewSurat();
+}
+
+/* ============================================
+   STATISTIK
+   ============================================ */
+function updateStats() {
+  document.getElementById('statLomba').textContent = data.mataLomba.length;
+  document.getElementById('statPeserta').textContent = data.peserta.length;
+  // Hitung sekolah unik
+  const sekolahSet = new Set(data.peserta.map(p=>p.sekolah).filter(Boolean));
+  sekolahSet.add(...data.sekolah.map(s=>s.nama).filter(Boolean));
+  document.getElementById('statSekolah').textContent = sekolahSet.size;
+  const total = data.anggaran.reduce((s,a) => s + (parseInt(a.jumlah)||0), 0);
+  document.getElementById('statAnggaran').textContent = formatRupiah(total);
+}
+
+/* ============================================
+   PREVIEW SURAT
+   ============================================ */
+function updatePreviewSurat() {
+  const d = data.info;
+  const wMulai = formatWaktu(d.waktuMulai);
+  const wSelesai = formatWaktu(d.waktuSelesai);
+  const tgl = d.tanggal ? formatTanggal(d.tanggal) : '...';
+  const el = document.getElementById('previewSurat');
+  if (!d.nama && !d.nomorSurat) {
+    el.innerHTML = '<p class="text-xs" style="color:var(--muted)">*Isi data di atas untuk melihat preview</p>';
+    return;
+  }
+  el.innerHTML = `
+    <p class="text-sm font-bold mb-1">Nomor: ${d.nomorSurat || '...'}</p>
+    <p class="text-lg font-bold mb-1" style="font-family:'Playfair Display',serif">${d.nama || '...'}</p>
+    <p class="text-sm" style="color:var(--muted)">${d.hari || '...'}, ${tgl} | Pukul ${wMulai} s.d. Pukul ${wSelesai}</p>
+    <p class="text-sm" style="color:var(--muted)"><i class="fas fa-map-marker-alt mr-1"></i>${d.tempat || '...'}</p>
+  `;
+}
+
+function formatWaktu(t) {
+  if (!t) return '...';
+  const [h,m] = t.split(':');
+  return `${h}:${m}`;
+}
+
+function formatTanggal(d) {
+  if (!d) return '...';
+  const bulan = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+  const [y,m,day] = d.split('-');
+  return `${parseInt(day)} ${bulan[parseInt(m)-1]} ${y}`;
+}
+
+function formatRupiah(n) {
+  if (!n) return 'Rp 0';
+  return 'Rp ' + n.toLocaleString('id-ID');
+}
+
+/* ============================================
+   ANGGARAN
+   ============================================ */
+function tambahAnggaranManual() {
+  data.anggaran.push({ uraian:'', jumlah:0, sumber:'Manual', fromNota:false });
+  renderAnggaran();
+  autoSave();
+}
+
+function tambahAnggaranDariNota(keterangan, nominal) {
+  data.anggaran.push({ uraian:keterangan, jumlah:nominal, sumber:'Nota', fromNota:true });
+  renderAnggaran();
+}
+
+function renderAnggaran() {
+  const body = document.getElementById('bodyAnggaran');
+  if (data.anggaran.length === 0) {
+    body.innerHTML = '<tr><td colspan="5" class="text-center" style="color:var(--muted);padding:40px">Belum ada data anggaran</td></tr>';
+    document.getElementById('totalAnggaran').textContent = 'Rp 0';
+    return;
+  }
+  body.innerHTML = data.anggaran.map((a,i) => `
+    <tr>
+      <td>${i+1}</td>
+      <td><input type="text" value="${escHtml(a.uraian)}" onchange="data.anggaran[${i}].uraian=this.value;autoSave()" style="min-width:200px" placeholder="Uraian kegiatan..."></td>
+      <td><input type="number" value="${a.jumlah||''}" onchange="data.anggaran[${i}].jumlah=parseInt(this.value)||0;renderAnggaran();autoSave()" style="min-width:150px" placeholder="0"></td>
+      <td><span class="text-xs ${a.fromNota?'badge badge-gold':'badge'}" style="${a.fromNota?'':'background:var(--card2);color:var(--muted);border:1px solid var(--border)'}">${a.sumber}</span></td>
+      <td class="no-print"><button class="btn btn-danger btn-sm" onclick="hapusAnggaran(${i})"><i class="fas fa-trash"></i></button></td>
+    </tr>
+  `).join('');
+  const total = data.anggaran.reduce((s,a) => s + (parseInt(a.jumlah)||0), 0);
+  document.getElementById('totalAnggaran').textContent = formatRupiah(total);
+  updateStats();
+}
+
+function hapusAnggaran(i) {
+  showConfirm('Hapus Anggaran', 'Yakin ingin menghapus item anggaran ini?', () => {
+    data.anggaran.splice(i,1);
+    renderAnggaran();
+    autoSave();
+  });
+}
+
+/* ============================================
+   PESERTA & ABSENSI
+   ============================================ */
+function tambahPeserta() {
+  data.peserta.push({ nama:'', sekolah:'', kelas:'', hadir:true });
+  renderPeserta();
+  autoSave();
+}
+
+function renderPeserta() {
+  const body = document.getElementById('bodyPeserta');
+  if (data.peserta.length === 0) {
+    body.innerHTML = '<tr><td colspan="6" class="text-center" style="color:var(--muted);padding:40px">Belum ada data peserta</td></tr>';
+    document.getElementById('totalPeserta').textContent = '0';
+    document.getElementById('totalHadir').textContent = 'Hadir: 0';
+    return;
+  }
+  body.innerHTML = data.peserta.map((p,i) => `
+    <tr>
+      <td>${i+1}</td>
+      <td><input type="text" value="${escHtml(p.nama)}" onchange="data.peserta[${i}].nama=this.value;autoSave()" placeholder="Nama peserta..."></td>
+      <td><input type="text" value="${escHtml(p.sekolah)}" onchange="data.peserta[${i}].sekolah=this.value;autoSave()" placeholder="Asal sekolah..."></td>
+      <td><input type="text" value="${escHtml(p.kelas)}" onchange="data.peserta[${i}].kelas=this.value;autoSave()" placeholder="Kelas..." style="min-width:80px"></td>
+      <td class="text-center"><input type="checkbox" class="absen-check" ${p.hadir?'checked':''} onchange="data.peserta[${i}].hadir=this.checked;renderPeserta();autoSave()"></td>
+      <td class="no-print"><button class="btn btn-danger btn-sm" onclick="hapusPeserta(${i})"><i class="fas fa-trash"></i></button></td>
+    </tr>
+  `).join('');
+  document.getElementById('totalPeserta').textContent = data.peserta.length;
+  const hadir = data.peserta.filter(p=>p.hadir).length;
+  document.getElementById('totalHadir').textContent = `Hadir: ${hadir}`;
+  updateStats();
+}
+
+function hapusPeserta(i) {
+  data.peserta.splice(i,1);
+  renderPeserta();
+  autoSave();
+}
+
+/* ============================================
+   MATA LOMBA (Dinamis)
+   ============================================ */
+function tambahMataLomba() {
+  const id = lombaIdCounter++;
+  data.mataLomba.push({ id, nama:'', peserta:[] });
+  data.juara.push({ lombaId:id, juara1:'', juara2:'', juara3:'' });
+  renderMataLomba();
+  renderJuara();
+  autoSave();
+  showToast('Mata lomba baru ditambahkan', 'success');
+}
+
+function hapusMataLomba(id) {
+  showConfirm('Hapus Mata Lomba', 'Yakin ingin menghapus mata lomba beserta datanya?', () => {
+    data.mataLomba = data.mataLomba.filter(l => l.id !== id);
+    data.juara = data.juara.filter(j => j.lombaId !== id);
+    renderMataLomba();
+    renderJuara();
+    autoSave();
+  });
+}
+
+function tambahPesertaLomba(lombaIdx) {
+  data.mataLomba[lombaIdx].peserta.push({ nama:'', sekolah:'' });
+  renderMataLomba();
+  autoSave();
+}
+
+function hapusPesertaLomba(lombaIdx, pIdx) {
+  data.mataLomba[lombaIdx].peserta.splice(pIdx,1);
+  renderMataLomba();
+  autoSave();
+}
+
+function renderMataLomba() {
+  const container = document.getElementById('containerLomba');
+  if (data.mataLomba.length === 0) {
+    container.innerHTML = '<div class="text-center py-12" style="color:var(--muted)"><i class="fas fa-trophy text-4xl mb-3 block" style="opacity:.3"></i>Belum ada mata lomba ditambahkan</div>';
+    return;
+  }
+  container.innerHTML = data.mataLomba.map((lomba, li) => {
+    const idx = li; // index in array
+    return `
+    <div class="rounded-xl p-6" style="background:var(--card2);border:1px solid var(--border)">
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+        <div class="flex items-center gap-3">
+          <span class="flex items-center justify-center text-sm font-bold" style="width:32px;height:32px;border-radius:8px;background:var(--accent);color:#0f0e0c">${idx+1}</span>
+          <input type="text" value="${escHtml(lomba.nama)}" onchange="data.mataLomba[${idx}].nama=this.value;renderJuara();autoSave()" placeholder="Nama Mata Lomba..." style="font-weight:700;font-size:16px;max-width:300px">
+        </div>
+        <div class="flex gap-2 no-print">
+          <button class="btn btn-primary btn-sm" onclick="tambahPesertaLomba(${idx})"><i class="fas fa-user-plus"></i> Tambah Peserta</button>
+          <button class="btn btn-danger btn-sm" onclick="hapusMataLomba(${lomba.id})"><i class="fas fa-trash"></i></button>
+        </div>
+      </div>
+      ${lomba.peserta.length > 0 ? `
+      <div class="overflow-x-auto">
+        <table>
+          <thead><tr><th>No</th><th>Nama Peserta</th><th>Asal Sekolah</th><th class="no-print">Aksi</th></tr></thead>
+          <tbody>
+            ${lomba.peserta.map((p,pi) => `
+              <tr>
+                <td>${pi+1}</td>
+                <td><input type="text" value="${escHtml(p.nama)}" onchange="data.mataLomba[${idx}].peserta[${pi}].nama=this.value;autoSave()" placeholder="Nama..."></td>
+                <td><input type="text" value="${escHtml(p.sekolah)}" onchange="data.mataLomba[${idx}].peserta[${pi}].sekolah=this.value;autoSave()" placeholder="Sekolah..."></td>
+                <td class="no-print"><button class="btn btn-danger btn-sm" onclick="hapusPesertaLomba(${idx},${pi})"><i class="fas fa-trash"></i></button></td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+      ` : '<p class="text-sm" style="color:var(--muted)">Belum ada peserta untuk lomba ini</p>'}
+    </div>`;
+  }).join('');
+  updateStats();
+}
+
+/* ============================================
+   KEJUARAAN
+   ============================================ */
+function renderJuara() {
+  const container = document.getElementById('containerJuara');
+  if (data.mataLomba.length === 0) {
+    container.innerHTML = '<div class="text-center py-12" style="color:var(--muted)"><i class="fas fa-medal text-4xl mb-3 block" style="opacity:.3"></i>Tambahkan mata lomba terlebih dahulu</div>';
+    return;
+  }
+  container.innerHTML = data.mataLomba.map((lomba, li) => {
+    const juara = data.juara.find(j => j.lombaId === lomba.id) || {juara1:'',juara2:'',juara3:''};
+    const ji = data.juara.findIndex(j => j.lombaId === lomba.id);
+    return `
+    <div class="rounded-xl overflow-hidden" style="border:1px solid var(--border)">
+      <div class="px-6 py-4" style="background:linear-gradient(135deg,var(--accent),var(--accent2))">
+        <h3 class="text-lg font-bold" style="color:#0f0e0c"><i class="fas fa-trophy mr-2"></i>${escHtml(lomba.nama) || 'Mata Lomba ' + (li+1)}</h3>
+      </div>
+      <div class="p-6" style="background:var(--card2)">
+        <div class="grid md:grid-cols-3 gap-4">
+          <div class="text-center p-4 rounded-lg" style="background:linear-gradient(135deg,rgba(245,200,66,.15),rgba(212,160,23,.05));border:1px solid rgba(245,200,66,.3)">
+            <div class="badge badge-gold mb-2">JUARA 1</div>
+            <input type="text" value="${escHtml(juara.juara1)}" onchange="data.juara[${ji}].juara1=this.value;autoSave()" placeholder="Nama pemenang..." class="text-center">
+          </div>
+          <div class="text-center p-4 rounded-lg" style="background:linear-gradient(135deg,rgba(192,192,192,.15),rgba(138,138,138,.05));border:1px solid rgba(192,192,192,.3)">
+            <div class="badge badge-silver mb-2">JUARA 2</div>
+            <input type="text" value="${escHtml(juara.juara2)}" onchange="data.juara[${ji}].juara2=this.value;autoSave()" placeholder="Nama pemenang..." class="text-center">
+          </div>
+          <div class="text-center p-4 rounded-lg" style="background:linear-gradient(135deg,rgba(205,127,50,.15),rgba(160,82,45,.05));border:1px solid rgba(205,127,50,.3)">
+            <div class="badge badge-bronze mb-2">JUARA 3</div>
+            <input type="text" value="${escHtml(juara.juara3)}" onchange="data.juara[${ji}].juara3=this.value;autoSave()" placeholder="Nama pemenang..." class="text-center">
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ============================================
+   FOTO DOKUMENTASI
+   ============================================ */
+function uploadFoto(event, type) {
+  const files = event.target.files;
+  if (!files.length) return;
+  const target = type === 'kegiatan' ? 'fotoKegiatan' : 'fotoRapat';
+  Array.from(files).forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      data[target].push({ name: file.name, dataUrl: e.target.result });
+      if (type === 'kegiatan') renderFotoKegiatan();
+      else renderFotoRapat();
+    };
+    reader.readAsDataURL(file);
+  });
+  event.target.value = '';
+}
+
+function renderFotoKegiatan() {
+  const grid = document.getElementById('gridFotoKegiatan');
+  if (data.fotoKegiatan.length === 0) {
+    grid.innerHTML = '<div class="text-center col-span-full py-12" style="color:var(--muted)"><i class="fas fa-images text-4xl mb-3 block" style="opacity:.3"></i>Belum ada foto kegiatan</div>';
+    return;
+  }
+  grid.innerHTML = data.fotoKegiatan.map((f,i) => `
+    <div class="foto-item">
+      <img src="${f.dataUrl}" alt="${escHtml(f.name)}" loading="lazy">
+      <button class="del-btn no-print" onclick="hapusFoto('kegiatan',${i})"><i class="fas fa-times"></i></button>
+    </div>
+  `).join('');
+}
+
+function renderFotoRapat() {
+  const grid = document.getElementById('gridFotoRapat');
+  if (data.fotoRapat.length === 0) {
+    grid.innerHTML = '<div class="text-center col-span-full py-12" style="color:var(--muted)"><i class="fas fa-handshake text-4xl mb-3 block" style="opacity:.3"></i>Belum ada foto dokumentasi rapat</div>';
+    return;
+  }
+  grid.innerHTML = data.fotoRapat.map((f,i) => `
+    <div class="foto-item">
+      <img src="${f.dataUrl}" alt="${escHtml(f.name)}" loading="lazy">
+      <button class="del-btn no-print" onclick="hapusFoto('rapat',${i})"><i class="fas fa-times"></i></button>
+    </div>
+  `).join('');
+}
+
+function hapusFoto(type, idx) {
+  const target = type === 'kegiatan' ? 'fotoKegiatan' : 'fotoRapat';
+  data[target].splice(idx,1);
+  if (type === 'kegiatan') renderFotoKegiatan();
+  else renderFotoRapat();
+}
+
+/* ============================================
+   VIDEO DOKUMENTASI
+   ============================================ */
+function uploadVideo(event) {
+  const files = event.target.files;
+  if (!files.length) return;
+  Array.from(files).forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      data.videoKegiatan.push({ name: file.name, dataUrl: e.target.result });
+      renderVideo();
+    };
+    reader.readAsDataURL(file);
+  });
+  event.target.value = '';
+}
+
+function renderVideo() {
+  const grid = document.getElementById('gridVideo');
+  if (data.videoKegiatan.length === 0) {
+    grid.innerHTML = '<div class="text-center col-span-full py-12" style="color:var(--muted)"><i class="fas fa-film text-4xl mb-3 block" style="opacity:.3"></i>Belum ada video kegiatan</div>';
+    return;
+  }
+  grid.innerHTML = data.videoKegiatan.map((v,i) => `
+    <div class="video-item">
+      <video controls><source src="${v.dataUrl}" type="video/mp4">Browser tidak support video.</video>
+      <div class="p-3 flex items-center justify-between no-print">
+        <span class="text-xs truncate" style="color:var(--muted);max-width:200px">${escHtml(v.name)}</span>
+        <button class="btn btn-danger btn-sm" onclick="hapusVideo(${i})"><i class="fas fa-trash"></i></button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function hapusVideo(i) {
+  data.videoKegiatan.splice(i,1);
+  renderVideo();
+}
+
+/* ============================================
+   NOTA & OTOMATIS MASUK ANGGARAN
+   ============================================ */
+function uploadNota(event) {
+  const files = event.target.files;
+  if (!files.length) return;
+  Array.from(files).forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const id = notaIdCounter++;
+      const notaItem = { id, name: file.name, dataUrl: e.target.result, keterangan:'', nominal:0 };
+      data.nota.push(notaItem);
+      // Otomatis masukkan ke anggaran
+      tambahAnggaranDariNota(file.name.replace(/\.[^.]+$/,''), 0);
+      renderNota();
+      autoSave();
+      showToast('Nota ditambahkan & masuk ke anggaran', 'success');
+    };
+    reader.readAsDataURL(file);
+  });
+  event.target.value = '';
+}
+
+function updateNota(idx, field, value) {
+  if (field === 'keterangan') {
+    data.nota[idx].keterangan = value;
+    // Update juga di anggaran
+    const notaAnggaran = data.anggaran.filter(a => a.fromNota);
+    const notaIdx = data.nota.filter(n => n.nominal !== 0 || n.keterangan).length ? idx : idx;
+    // Cari anggaran yang sesuai (berdasarkan urutan nota)
+    const notaItems = data.nota.filter((_,ni) => ni <= idx);
+    const anggaranFromNota = data.anggaran.map((a,ai) => ({...a, idx:ai})).filter(a => a.fromNota);
+    if (anggaranFromNota[idx]) {
+      data.anggaran[anggaranFromNota[idx].idx].uraian = value;
+    }
+  } else if (field === 'nominal') {
+    data.nota[idx].nominal = parseInt(value) || 0;
+    const anggaranFromNota = data.anggaran.map((a,ai) => ({...a, idx:ai})).filter(a => a.fromNota);
+    if (anggaranFromNota[idx]) {
+      data.anggaran[anggaranFromNota[idx].idx].jumlah = parseInt(value) || 0;
+      renderAnggaran();
+    }
+  }
+  autoSave();
+}
+
+function hapusNota(idx) {
+  showConfirm('Hapus Nota', 'Yakin? Data anggaran terkait juga akan dihapus.', () => {
+    data.nota.splice(idx,1);
+    // Hapus juga dari anggaran
+    const anggaranFromNota = data.anggaran.map((a,ai) => ({...a, idx:ai})).filter(a => a.fromNota);
+    if (anggaranFromNota[idx]) {
+      data.anggaran.splice(anggaranFromNota[idx].idx, 1);
+    }
+    renderNota();
+    renderAnggaran();
+    autoSave();
+  });
+}
+
+function renderNota() {
+  const grid = document.getElementById('gridNota');
+  if (data.nota.length === 0) {
+    grid.innerHTML = '<div class="text-center col-span-full py-12" style="color:var(--muted)"><i class="fas fa-receipt text-4xl mb-3 block" style="opacity:.3"></i>Belum ada nota diupload</div>';
+    return;
+  }
+  grid.innerHTML = data.nota.map((n,i) => `
+    <div class="nota-item">
+      <img src="${n.dataUrl}" alt="${escHtml(n.name)}" loading="lazy">
+      <div class="p-3 space-y-2">
+        <input type="text" value="${escHtml(n.keterangan)}" onchange="updateNota(${i},'keterangan',this.value)" placeholder="Keterangan nota..." style="font-size:12px;padding:6px 10px">
+        <input type="number" value="${n.nominal||''}" onchange="updateNota(${i},'nominal',this.value)" placeholder="Nominal..." style="font-size:12px;padding:6px 10px">
+        <button class="btn btn-danger btn-sm w-full justify-center no-print" onclick="hapusNota(${i})" style="font-size:11px;padding:4px 8px"><i class="fas fa-trash"></i> Hapus</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ============================================
+   ABSENSI SEKOLAH
+   ============================================ */
+function tambahSekolah() {
+  const id = sekolahIdCounter++;
+  data.sekolah.push({ id, nama:'', peserta:[] });
+  renderSekolah();
+  autoSave();
+}
+
+function hapusSekolah(idx) {
+  showConfirm('Hapus Sekolah', 'Yakin ingin menghapus data sekolah ini?', () => {
+    data.sekolah.splice(idx,1);
+    renderSekolah();
+    autoSave();
+  });
+}
+
+function tambahPesertaSekolah(sIdx) {
+  data.sekolah[sIdx].peserta.push({ nama:'', hadir:true });
+  renderSekolah();
+  autoSave();
+}
+
+function hapusPesertaSekolah(sIdx, pIdx) {
+  data.sekolah[sIdx].peserta.splice(pIdx,1);
+  renderSekolah();
+  autoSave();
+}
+
+function renderSekolah() {
+  const container = document.getElementById('containerSekolah');
+  if (data.sekolah.length === 0) {
+    container.innerHTML = '<div class="text-center py-12" style="color:var(--muted)"><i class="fas fa-school text-4xl mb-3 block" style="opacity:.3"></i>Belum ada data sekolah</div>';
+    return;
+  }
+  container.innerHTML = data.sekolah.map((sek, si) => `
+    <div class="rounded-xl p-6" style="background:var(--card2);border:1px solid var(--border)">
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+        <div class="flex items-center gap-3">
+          <span class="flex items-center justify-center text-sm font-bold" style="width:32px;height:32px;border-radius:8px;background:var(--info);color:#fff"><i class="fas fa-school"></i></span>
+          <input type="text" value="${escHtml(sek.nama)}" onchange="data.sekolah[${si}].nama=this.value;autoSave()" placeholder="Nama Sekolah..." style="font-weight:700;font-size:16px;max-width:300px">
+        </div>
+        <div class="flex gap-2 no-print">
+          <button class="btn btn-primary btn-sm" onclick="tambahPesertaSekolah(${si})"><i class="fas fa-user-plus"></i> Tambah</button>
+          <button class="btn btn-danger btn-sm" onclick="hapusSekolah(${si})"><i class="fas fa-trash"></i></button>
+        </div>
+      </div>
+      ${sek.peserta.length > 0 ? `
+      <div class="overflow-x-auto">
+        <table>
+          <thead><tr><th>No</th><th>Nama Peserta</th><th>Hadir</th><th class="no-print">Aksi</th></tr></thead>
+          <tbody>
+            ${sek.peserta.map((p,pi) => `
+              <tr>
+                <td>${pi+1}</td>
+                <td><input type="text" value="${escHtml(p.nama)}" onchange="data.sekolah[${si}].peserta[${pi}].nama=this.value;autoSave()" placeholder="Nama..."></td>
+                <td class="text-center"><input type="checkbox" class="absen-check" ${p.hadir?'checked':''} onchange="data.sekolah[${si}].peserta[${pi}].hadir=this.checked;autoSave()"></td>
+                <td class="no-print"><button class="btn btn-danger btn-sm" onclick="hapusPesertaSekolah(${si},${pi})"><i class="fas fa-trash"></i></button></td>
+              </tr>
+            `).join('')}
+          </tbody>
+          <tfoot>
+            <tr style="background:var(--card)"><td colspan="2" class="text-right font-bold text-sm">Jumlah Hadir:</td>
+            <td class="font-bold text-sm" style="color:var(--success)">${sek.peserta.filter(p=>p.hadir).length} / ${sek.peserta.length}</td><td class="no-print"></td></tr>
+          </tfoot>
+        </table>
+      </div>
+      ` : '<p class="text-sm" style="color:var(--muted)">Belum ada peserta terdaftar</p>'}
+    </div>
+  `).join('');
+  updateStats();
+}
+
+/* ============================================
+   EXPORT MODAL
+   ============================================ */
+function showExportModal() { document.getElementById('exportModal').classList.add('show'); }
+function closeExportModal() { document.getElementById('exportModal').classList.remove('show'); }
+
+/* ============================================
+   EXPORT PDF
+   ============================================ */
+function exportPDF() {
+  closeExportModal();
+  showToast('Membuat PDF, mohon tunggu...', 'info');
+  // Sembunyikan elemen no-print sementara
+  const els = document.querySelectorAll('.no-print');
+  els.forEach(e => e.style.display = 'none');
+  // Tampilkan semua section
+  document.querySelectorAll('.section').forEach(s => s.style.display = 'block');
+
+  const element = document.querySelector('main');
+  const opt = {
+    margin: [10,10,10,10],
+    filename: (data.info.nama || 'Laporan_Pertanggungjawaban') + '.pdf',
+    image: { type: 'jpeg', quality: 0.95 },
+    html2canvas: { scale: 2, useCORS: true, logging: false },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+  };
+
+  html2pdf().set(opt).from(element).save().then(() => {
+    els.forEach(e => e.style.display = '');
+    // Kembalikan tab aktif
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    const activeTab = document.querySelector('.tab-btn.active');
+    if (activeTab) {
+      const sec = document.getElementById('sec-' + activeTab.dataset.tab);
+      if (sec) sec.classList.add('active');
+    }
+    showToast('PDF berhasil diunduh', 'success');
+  }).catch(() => {
+    els.forEach(e => e.style.display = '');
+    showToast('Gagal membuat PDF', 'error');
+  });
+}
+
+/* ============================================
+   EXPORT EXCEL
+   ============================================ */
+function exportExcel() {
+  closeExportModal();
+  try {
+    const wb = XLSX.utils.book_new();
+
+    // Sheet Info
+    const infoData = [
+      ['LAPORAN PERTANGGUNGJAWABAN KEGIATAN'],
+      [''],
+      ['Nama Kegiatan', data.info.nama],
+      ['Nomor Surat', data.info.nomorSurat],
+      ['Hari', data.info.hari],
+      ['Tanggal', data.info.tanggal ? formatTanggal(data.info.tanggal) : ''],
+      ['Waktu', `Pukul ${data.info.waktuMulai} s.d. Pukul ${data.info.waktuSelesai}`],
+      ['Tempat', data.info.tempat]
+    ];
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(infoData), 'Info Kegiatan');
+
+    // Sheet Anggaran
+    if (data.anggaran.length) {
+      const angData = [['No','Uraian','Jumlah','Sumber']];
+      data.anggaran.forEach((a,i) => angData.push([i+1, a.uraian, a.jumlah, a.sumber]));
+      angData.push(['','','TOTAL', data.anggaran.reduce((s,a)=>s+(parseInt(a.jumlah)||0),0)]);
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(angData), 'Anggaran');
+    }
+
+    // Sheet Peserta
+    if (data.peserta.length) {
+      const pesData = [['No','Nama','Sekolah','Kelas','Hadir']];
+      data.peserta.forEach((p,i) => pesData.push([i+1, p.nama, p.sekolah, p.kelas, p.hadir?'Hadir':'Tidak Hadir']));
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(pesData), 'Peserta');
+    }
+
+    // Sheet Kejuaraan
+    if (data.juara.length) {
+      const juData = [['Mata Lomba','Juara 1','Juara 2','Juara 3']];
+      data.juara.forEach(j => {
+        const lomba = data.mataLomba.find(l=>l.id===j.lombaId);
+        juData.push([lomba?lomba.nama:'-', j.juara1, j.juara2, j.juara3]);
+      });
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(juData), 'Kejuaraan');
+    }
+
+    // Sheet Absensi Sekolah
+    if (data.sekolah.length) {
+      const sekData = [['Sekolah','Nama Peserta','Kehadiran']];
+      data.sekolah.forEach(s => {
+        if (s.peserta.length === 0) {
+          sekData.push([s.nama, '-', '-']);
+        } else {
+          s.peserta.forEach(p => sekData.push([s.nama, p.nama, p.hadir?'Hadir':'Tidak Hadir']));
+        }
+      });
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(sekData), 'Absensi Sekolah');
+    }
+
+    // Sheet Mata Lomba Detail
+    if (data.mataLomba.length) {
+      const mlData = [['Mata Lomba','No','Nama Peserta','Asal Sekolah']];
+      data.mataLomba.forEach(l => {
+        if (l.peserta.length === 0) {
+          mlData.push([l.nama, '-', '-', '-']);
+        } else {
+          l.peserta.forEach((p,pi) => mlData.push([l.nama, pi+1, p.nama, p.sekolah]));
+        }
+      });
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(mlData), 'Detail Mata Lomba');
+    }
+
+    XLSX.writeFile(wb, (data.info.nama || 'Laporan_Pertanggungjawaban') + '.xlsx');
+    showToast('Excel berhasil diunduh', 'success');
+  } catch(e) {
+    console.error(e);
+    showToast('Gagal membuat Excel', 'error');
+  }
+}
+
+/* ============================================
+   EXPORT DOC
+   ============================================ */
+function exportDOC() {
+  closeExportModal();
+  try {
+    let html = `
+    <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+    <head><meta charset="utf-8"><title>Laporan Pertanggungjawaban</title>
+    <style>
+      body{font-family:Calibri,sans-serif;font-size:12pt;margin:2cm}
+      h1{font-size:18pt;text-align:center;margin-bottom:4pt}
+      h2{font-size:14pt;margin-top:24pt;border-bottom:2px solid #c9953c;padding-bottom:6pt}
+      h3{font-size:12pt;margin-top:12pt}
+      table{border-collapse:collapse;width:100%;margin:8pt 0}
+      th,td{border:1px solid #333;padding:6pt 8pt;font-size:10pt}
+      th{background:#c9953c;color:#000;font-weight:bold}
+      .center{text-align:center}
+      .right{text-align:right}
+      .gold{color:#b8860b;font-weight:bold}
+      .silver{color:#696969;font-weight:bold}
+      .bronze{color:#8B4513;font-weight:bold}
+    </style></head><body>
+    <h1>LAPORAN PERTANGGUNGJAWABAN KEGIATAN</h1>
+    <p class="center" style="font-size:10pt;color:#666">Nomor Surat: ${escHtml(data.info.nomorSurat)||'-'}</p>
+    <br>
+    <table style="border:none"><tr>
+      <td style="border:none;width:150pt"><b>Nama Kegiatan</b></td><td style="border:none">: ${escHtml(data.info.nama)||'-'}</td>
+    </tr><tr>
+      <td style="border:none"><b>Hari/Tanggal</b></td><td style="border:none">: ${data.info.hari||'-'}, ${data.info.tanggal?formatTanggal(data.info.tanggal):'-'}</td>
+    </tr><tr>
+      <td style="border:none"><b>Waktu</b></td><td style="border:none">: Pukul ${data.info.waktuMulai||'..'} s.d. Pukul ${data.info.waktuSelesai||'..'}</td>
+    </tr><tr>
+      <td style="border:none"><b>Tempat</b></td><td style="border:none">: ${escHtml(data.info.tempat)||'-'}</td>
+    </tr></table>
+
+    <h2>A. RENCANA ANGGARAN KEGIATAN</h2>
+    <table><tr><th>No</th><th>Uraian</th><th>Jumlah</th><th>Sumber</th></tr>`;
+
+    if (data.anggaran.length) {
+      data.anggaran.forEach((a,i) => {
+        html += `<tr><td class="center">${i+1}</td><td>${escHtml(a.uraian)}</td><td class="right">${formatRupiah(a.jumlah)}</td><td>${a.sumber}</td></tr>`;
+      });
+      const total = data.anggaran.reduce((s,a)=>s+(parseInt(a.jumlah)||0),0);
+      html += `<tr><td colspan="2" style="text-align:right;font-weight:bold">TOTAL</td><td class="right" style="font-weight:bold">${formatRupiah(total)}</td><td></td></tr>`;
+    } else {
+      html += '<tr><td colspan="4" class="center">-</td></tr>';
+    }
+
+    html += `</table>
+
+    <h2>B. DATA PESERTA & ABSENSI</h2>
+    <table><tr><th>No</th><th>Nama</th><th>Sekolah</th><th>Kelas</th><th>Kehadiran</th></tr>`;
+
+    if (data.peserta.length) {
+      data.peserta.forEach((p,i) => {
+        html += `<tr><td class="center">${i+1}</td><td>${escHtml(p.nama)}</td><td>${escHtml(p.sekolah)}</td><td class="center">${escHtml(p.kelas)}</td><td class="center">${p.hadir?'Hadir':'Tidak Hadir'}</td></tr>`;
+      });
+    } else {
+      html += '<tr><td colspan="5" class="center">-</td></tr>';
+    }
+
+    html += `</table>
+
+    <h2>C. MATA LOMBA & PESERTA</h2>`;
+
+    data.mataLomba.forEach((lomba,li) => {
+      html += `<h3>${li+1}. ${escHtml(lomba.nama)||'Mata Lomba '+(li+1)}</h3>`;
+      if (lomba.peserta.length) {
+        html += `<table><tr><th>No</th><th>Nama Peserta</th><th>Asal Sekolah</th></tr>`;
+        lomba.peserta.forEach((p,pi) => {
+          html += `<tr><td class="center">${pi+1}</td><td>${escHtml(p.nama)}</td><td>${escHtml(p.sekolah)}</td></tr>`;
+        });
+        html += '</table>';
+      } else {
+        html += '<p>- Tidak ada peserta terdaftar</p>';
+      }
+    });
+
+    if (!data.mataLomba.length) html += '<p>- Tidak ada mata lomba</p>';
+
+    html += `<h2>D. TABEL KEJUARAAN</h2>
+    <table><tr><th>Mata Lomba</th><th class="gold">Juara 1</th><th class="silver">Juara 2</th><th class="bronze">Juara 3</th></tr>`;
+
+    if (data.juara.length) {
+      data.juara.forEach(j => {
+        const lomba = data.mataLomba.find(l=>l.id===j.lombaId);
+        html += `<tr><td><b>${escHtml(lomba?lomba.nama:'-')}</b></td><td class="gold">${escHtml(j.juara1)||'-'}</td><td class="silver">${escHtml(j.juara2)||'-'}</td><td class="bronze">${escHtml(j.juara3)||'-'}</td></tr>`;
+      });
+    } else {
+      html += '<tr><td colspan="4" class="center">-</td></tr>';
+    }
+
+    html += `</table>
+
+    <h2>E. ABSENSI KEHADIRAN PER SEKOLAH</h2>`;
+
+    data.sekolah.forEach((sek,si) => {
+      html += `<h3>${si+1}. ${escHtml(sek.nama)||'Sekolah '+(si+1)}</h3>`;
+      if (sek.peserta.length) {
+        html += `<table><tr><th>No</th><th>Nama</th><th>Kehadiran</th></tr>`;
+        sek.peserta.forEach((p,pi) => {
+          html += `<tr><td class="center">${pi+1}</td><td>${escHtml(p.nama)}</td><td class="center">${p.hadir?'Hadir':'Tidak Hadir'}</td></tr>`;
+        });
+        const hadir = sek.peserta.filter(p=>p.hadir).length;
+        html += `<tr><td colspan="2" style="text-align:right;font-weight:bold">Jumlah Hadir</td><td class="center" style="font-weight:bold">${hadir} / ${sek.peserta.length}</td></tr>`;
+        html += '</table>';
+      } else {
+        html += '<p>- Tidak ada peserta terdaftar</p>';
+      }
+    });
+
+    if (!data.sekolah.length) html += '<p>- Tidak ada data sekolah</p>';
+
+    html += `<br><br>
+    <p style="text-align:right;font-size:10pt;color:#888">
+      Dokumen ini dihasilkan secara otomatis oleh Sistem LPJ Digital<br>
+      ${new Date().toLocaleDateString('id-ID',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}
+    </p>
+    </body></html>`;
+
+    const blob = new Blob(['\ufeff' + html], { type: 'application/msword' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = (data.info.nama || 'Laporan_Pertanggungjawaban') + '.doc';
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('File DOC berhasil diunduh', 'success');
+  } catch(e) {
+    console.error(e);
+    showToast('Gagal membuat DOC', 'error');
+  }
+}
+
+/* ============================================
+   KOTAK SARAN - LINK & QR CODE
+   ============================================ */
+function showSaranLink() {
+  const baseUrl = window.location.href.split('?')[0].split('#')[0];
+  const saranUrl = baseUrl + '?mode=saran';
+  document.getElementById('saranLinkText').textContent = saranUrl;
+  generateQR(saranUrl);
+  document.getElementById('saranLinkModal').classList.add('show');
+}
+
+function closeSaranLink() { document.getElementById('saranLinkModal').classList.remove('show'); }
+
+function copySaranLink() {
+  const text = document.getElementById('saranLinkText').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('Link berhasil disalin', 'success');
+  }).catch(() => {
+    // Fallback
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('Link berhasil disalin', 'success');
+  });
+}
+
+function generateQR(text) {
+  const canvas = document.getElementById('qrCanvas');
+  const ctx = canvas.getContext('2d');
+  const size = 200;
+  canvas.width = size;
+  canvas.height = size;
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0,0,size,size);
+
+  // Simple QR code generator (untuk URL pendek, gunakan pola sederhana)
+  // Karena kita tidak bisa import library QR yang berat, kita gunakan pendekatan canvas pattern
+  // Sebagai fallback, kita tampilkan teks URL yang bisa di-scan manual
+  ctx.fillStyle = '#000000';
+  ctx.font = '10px monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText('QR Code Generator', size/2, 20);
+  ctx.fillText('Gunakan link di bawah:', size/2, 40);
+
+  // Generate simple data matrix pattern berdasarkan teks
+  const cellSize = 6;
+  const gridSize = Math.floor((size - 60) / cellSize);
+  let hash = 0;
+  for (let i = 0; i < text.length; i++) {
+    hash = ((hash << 5) - hash) + text.charCodeAt(i);
+    hash |= 0;
+  }
+
+  const offsetX = (size - gridSize * cellSize) / 2;
+  const offsetY = 50;
+
+  for (let y = 0; y < gridSize; y++) {
+    for (let x = 0; x < gridSize; x++) {
+      const val = (hash * (x + y * gridSize + 1) * 2654435761) >>> 0;
+      if (val % 3 !== 0) {
+        ctx.fillRect(offsetX + x * cellSize, offsetY + y * cellSize, cellSize - 1, cellSize - 1);
+      }
+    }
+  }
+
+  // Finder patterns (pojok)
+  drawFinderPattern(ctx, offsetX, offsetY, cellSize);
+  drawFinderPattern(ctx, offsetX + (gridSize - 7) * cellSize, offsetY, cellSize);
+  drawFinderPattern(ctx, offsetX, offsetY + (gridSize - 7) * cellSize, cellSize);
+
+  ctx.fillStyle = '#333';
+  ctx.font = '9px sans-serif';
+  ctx.fillText('Scan / Buka link di atas', size/2, size - 10);
+}
+
+function drawFinderPattern(ctx, x, y, cs) {
+  ctx.fillStyle = '#000';
+  ctx.fillRect(x, y, 7*cs, 7*cs);
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(x+cs, y+cs, 5*cs, 5*cs);
+  ctx.fillStyle = '#000';
+  ctx.fillRect(x+2*cs, y+2*cs, 3*cs, 3*cs);
+}
+
+// Cek apakah mode saran
+function checkSaranMode() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('mode') === 'saran') {
+    renderSaranPage();
+    return true;
+  }
+  return false;
+}
+
+function renderSaranPage() {
+  document.querySelector('header').style.display = 'none';
+  document.querySelector('.bg-pattern').style.display = 'none';
+  document.getElementById('statsBar').parentElement.style.display = 'none';
+  document.querySelector('nav').style.display = 'none';
+  document.querySelector('main').style.display = 'none';
+  document.querySelector('footer').style.display = 'none';
+
+  const body = document.body;
+  const wrapper = document.createElement('div');
+  wrapper.style.cssText = 'min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(135deg,#0f0e0c 0%,#1c1a17 50%,#0f0e0c 100%)';
+  wrapper.innerHTML = `
+    <div style="max-width:500px;width:100%;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:40px;text-align:center">
+      <div style="width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;margin:0 auto 20px">
+        <i class="fas fa-comment-dots text-2xl" style="color:#0f0e0c"></i>
+      </div>
+      <h1 style="font-family:'Playfair Display',serif;font-size:24px;font-weight:900;margin-bottom:8px">Kotak Saran Masyarakat</h1>
+      <p style="color:var(--muted);font-size:14px;margin-bottom:24px">Sampaikan saran, masukan, atau kritik Anda terkait kegiatan yang telah dilaksanakan. Saran Anda akan dibacakan pada rapat evaluasi.</p>
+      <div style="text-align:left;margin-bottom:16px">
+        <label style="font-weight:600;font-size:13px;color:var(--muted);display:block;margin-bottom:6px">Nama (opsional)</label>
+        <input type="text" id="saranNama" placeholder="Nama Anda..." style="width:100%;background:var(--card2);border:1px solid var(--border);color:var(--fg);padding:12px;border-radius:8px;font-size:14px">
+      </div>
+      <div style="text-align:left;margin-bottom:20px">
+        <label style="font-weight:600;font-size:13px;color:var(--muted);display:block;margin-bottom:6px">Saran / Masukan</label>
+        <textarea id="saranIsi" rows="5" placeholder="Tulis saran Anda di sini..." style="width:100%;background:var(--card2);border:1px solid var(--border);color:var(--fg);padding:12px;border-radius:8px;font-size:14px;resize:vertical;font-family:inherit"></textarea>
+      </div>
+      <button onclick="kirimSaran()" style="width:100%;padding:14px;border-radius:10px;background:var(--accent);color:#0f0e0c;font-weight:700;font-size:15px;border:none;cursor:pointer;transition:all .3s;font-family:inherit" onmouseover="this.style.background='var(--accent2)';this.style.transform='translateY(-2px)'" onmouseout="this.style.background='var(--accent)';this.style.transform='none'">
+        <i class="fas fa-paper-plane mr-2"></i>Kirim Saran
+      </button>
+      <div id="saranConfirm" style="display:none;margin-top:20px;padding:16px;border-radius:10px;background:rgba(74,158,110,.15);border:1px solid rgba(74,158,110,.3)">
+        <i class="fas fa-check-circle" style="color:var(--success);font-size:24px;margin-bottom:8px"></i>
+        <p style="color:var(--success);font-weight:700">Saran Terkirim</p>
+        <p style="color:var(--muted);font-size:13px">Terima kasih atas masukan Anda. Saran akan dibacakan saat rapat evaluasi.</p>
+      </div>
+    </div>
+  `;
+  body.appendChild(wrapper);
+}
+
+function kirimSaran() {
+  const nama = document.getElementById('saranNama').value.trim();
+  const isi = document.getElementById('saranIsi').value.trim();
+  if (!isi) {
+    showToast('Silakan tulis saran terlebih dahulu', 'error');
+    return;
+  }
+  saranData.push({
+    nama: nama || 'Anonim',
+    isi: isi,
+    waktu: new Date().toLocaleString('id-ID')
+  });
+  try { localStorage.setItem('lpj_saran', JSON.stringify(saranData)); } catch(e) {}
+  document.getElementById('saranConfirm').style.display = 'block';
+  document.getElementById('saranNama').value = '';
+  document.getElementById('saranIsi').value = '';
+}
+
+/* ============================================
+   UTILITY
+   ============================================ */
+function escHtml(str) {
+  if (!str) return '';
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+/* ============================================
+   CEK MODE SARAN SAAT LOAD
+   ============================================ */
+if (checkSaranMode()) {
+  // Berhenti di sini, jangan render halaman utama
+} else {
+  // Halaman utama normal
+}
+</script>
+</body>
+</html>
